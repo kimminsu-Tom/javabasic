@@ -1,4 +1,4 @@
-package rpg; //made by 20233132 김민수
+package rpg;
 
 import java.util.Scanner;
 
@@ -45,7 +45,6 @@ public class Rpggame1 {
 				System.out.println("1~3번중에서 입력하세요."); // 다른 번호를 눌렸을 때
 				break;
 			}
-			printHeroInfo(); // 수정된 부분: 히어로 정보를 출력
 		}
 	}
 
@@ -88,9 +87,7 @@ public class Rpggame1 {
 	}
 
 	static void hero_attacked(int sum) {
-		if (sum <= monster_defense) {
-			monster_hp = monster_hp;
-		} else {
+		if (sum > monster_defense) {
 			monster_hp = monster_hp + monster_defense - sum;
 		}
 	}
@@ -100,9 +97,7 @@ public class Rpggame1 {
 	}
 
 	static void monster_attacked(int sum) {
-		if (sum <= hero_defense) {
-			hero_hp = hero_hp;
-		} else {
+		if (sum > hero_defense) {
 			hero_hp = hero_hp + hero_defense - sum;
 		}
 	}
@@ -159,7 +154,8 @@ public class Rpggame1 {
 	}
 
 	static void mainBattleLoop(Scanner in) {
-		while (true) {
+		boolean flag = true;
+		while (flag) {
 			System.out.println(monster_name + "와 전투를 시작합니다.");
 
 			while (hero_hp > 0 && monster_hp > 0) {
@@ -187,37 +183,11 @@ public class Rpggame1 {
 				if (hero_experience >= hero_level * 80) {
 					levelUp();
 				}
-			}
-
-			if (hero_hp <= 0) {
+				flag = false;
+			} else if (hero_hp <= 0) {
 				System.out.println(hero_name + "이(가) 죽었습니다.");
 				hero_hp = original_hero_hp;
-
-				// 수정된 부분: enterHuntingGround()를 호출하는 부분을 수정
-				System.out.print("계속해서 전투하시겠습니까? (Y/N): ");
-				String continueBattle = in.nextLine();
-
-				if (!continueBattle.equalsIgnoreCase("Y")) {
-					break; // equals 문자열 비교 중에 대소문자 구분 안하는 함수
-				} else {
-					enterHuntingGround(); // 여기서 호출하도록 수정
-					selectMonster(in);
-				}
-			}
-
-			printHeroInfo();
-
-			if (hero_hp > 0) {
-				System.out.print("계속해서 전투하시겠습니까? (Y/N): ");
-				String continueBattle = in.nextLine();
-
-				if (!continueBattle.equalsIgnoreCase("Y")) {
-					break;
-				} else {
-					hero_hp = original_hero_hp;
-					monster_hp = 0;
-					selectMonster(in);
-				}
+				flag = false;
 			}
 		}
 	}
@@ -227,7 +197,6 @@ public class Rpggame1 {
 		System.out.println("1. 쓰러스트 (데미지: " + (hero_level * 10 + hero_power * 30) + ")");
 
 		int skillChoice = Integer.parseInt(in.nextLine());
-
 		switch (skillChoice) {
 		case 1:
 			return hero_level * 10 + hero_power * 30;
