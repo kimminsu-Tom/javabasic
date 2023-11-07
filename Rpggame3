@@ -143,23 +143,23 @@ class Hero {
 
 	// Inside the Hero class
 	public void increaseStrength() {
-	    power += 5;
+		power += 5;
 	}
 
 	public void increaseDefense() {
-	    defense += 5;
+		defense += 5;
 	}
 
 	public void increaseExperience() {
-	    experience += 50;
+		experience += 50;
 	}
 
 	public void increaseHP() {
-	    hp += 50;
+		hp += 50;
 	}
 
 	public void increaseMP() {
-	    mp += 50;
+		mp += 50;
 	}
 
 }
@@ -258,7 +258,7 @@ class PotionStore {
 		this.hero_money = hero_money;
 	}
 
-	public Hero potionStore_show(int num, Hero hero) {
+	public void potionStore_show(int num, Hero hero) {
 		int money = getItemPrice(num);
 
 		switch (num) {
@@ -291,10 +291,9 @@ class PotionStore {
 			System.out.println("올바른 번호를 입력하세요.");
 		}
 
-		hero_money -= money;
+		hero.setMoney(hero.getMoney() - money);
 		System.out.println("구입이 완료되었습니다.");
-		System.out.println(hero_money + "원 남았습니다.");
-		return hero;
+		System.out.println(hero.getMoney() + "원 남았습니다.");
 	}
 
 	private void increaseStrength(Hero hero) {
@@ -336,8 +335,7 @@ class PotionStore {
 			}
 
 			if (hero.getMoney() >= getItemPrice(choice)) {
-				hero = potionStore_show(choice, hero);
-				hero.setMoney(hero.getMoney() - getItemPrice(choice)); // 포션 구매 후 돈 차감
+				potionStore_show(choice, hero);
 			} else {
 				System.out.println("돈이 부족합니다.");
 			}
@@ -406,7 +404,6 @@ public class Rpggame3 {
 			break;
 		default:
 			System.out.println("올바른 번호를 입력하세요.");
-			return;
 		}
 
 		System.out.print("영웅의 이름을 입력하세요: ");
@@ -428,17 +425,17 @@ public class Rpggame3 {
 			case 1:
 				enterHuntingGround();
 				selectMonster(in);
-				mainBattleLoop(in);
+				mainBattleLoop(in, hero);
 				break;
 
 			case 2:
 				potionStore.showPotionMenu(in, hero);
-				hero_money = potionStore.getHero_money();
 				break;
 
 			case 3:
 				System.out.println("게임을 종료합니다.");
-				return;
+				in.close();
+				System.exit(0);
 
 			default:
 				System.out.println("1~3번중에서 입력하세요.");
@@ -467,7 +464,7 @@ public class Rpggame3 {
 			monster_defense = 5;
 			monster_power = 20;
 			monster_money = 10;
-			monster_experience = 10;
+			monster_experience = 100;
 			break;
 		case 2:
 			monster_name = "살쾡이";
@@ -476,7 +473,7 @@ public class Rpggame3 {
 			monster_power = 100;
 			monster_defense = 20;
 			monster_money = 30;
-			monster_experience = 50;
+			monster_experience = 200;
 			break;
 		case 3:
 			monster_name = "들개";
@@ -501,8 +498,8 @@ public class Rpggame3 {
 		}
 	}
 
-	static int hero_attack() {
-		return hero_level * 10 + hero_power * 30;
+	static int hero_attack(Hero hero) {
+		return hero.getLevel() * 10 + hero.getPower() * 30;
 	}
 
 	static void hero_attacked(int sum) {
@@ -515,43 +512,43 @@ public class Rpggame3 {
 		return monster_power;
 	}
 
-	static void monster_attacked(int sum) {
-		if (sum > hero_defense) {
-			hero_hp = hero_hp + hero_defense - sum;
+	static void monster_attacked(int sum, Hero hero) {
+		if (sum > hero.getDefense()) {
+			hero.setHp(hero.getHp() + hero.getDefense() - sum);
 		}
 	}
 
-	static void levelUp() {
-		hero_level++;
-		int moneyIncrease = hero_level * 50;
+	static void levelUp(Hero hero) {
+		hero.setLevel(hero.getLevel() + 1);
+		int moneyIncrease = hero.getLevel() * 50;
 		System.out.println("레벨이 올랐습니다!");
-		hero_money += moneyIncrease;
+		hero.setMoney(hero.getMoney() + moneyIncrease);
 		System.out.println("레벨업 기념으로 돈이 " + moneyIncrease + "원 증가했습니다.");
-		System.out.println(hero_money + "원이 되었습니다.");
-		hero_experience = 0;
+		System.out.println(hero.getMoney() + "원이 되었습니다.");
+		hero.setExperience(0);
 	}
 
 	static void printHeroInfo() {
 		System.out.println("---------------");
 		System.out.println("Hero 정보");
-		System.out.println("이름: " + hero_name);
-		System.out.println("레벨: " + hero_level);
-		System.out.println("힘: " + hero_power);
-		System.out.println("방어력: " + hero_defense);
-		System.out.println("HP: " + hero_hp);
-		System.out.println("MP: " + hero_mp);
-		System.out.println("경험치: " + hero_experience);
-		System.out.println("돈: " + hero_money);
+		System.out.println("이름: " + hero.getName());
+		System.out.println("레벨: " + hero.getLevel());
+		System.out.println("힘: " + hero.getPower());
+		System.out.println("방어력: " + hero.getDefense());
+		System.out.println("HP: " + hero.getHp());
+		System.out.println("MP: " + hero.getMp());
+		System.out.println("경험치: " + hero.getExperience());
+		System.out.println("돈: " + hero.getMoney());
 		System.out.println("---------------");
 	}
 
-	static void mainBattleLoop(Scanner in) {
+	static void mainBattleLoop(Scanner in, Hero hero) {
 		boolean flag = true;
 		while (flag) {
 			System.out.println(monster_name + "와 전투를 시작합니다.");
 
-			while (hero_hp > 0 && monster_hp > 0) {
-				System.out.println(hero_name + "의 공격입니다.");
+			while (hero.getHp() > 0 && monster_hp > 0) {
+				System.out.println(hero.getName() + "의 공격입니다.");
 
 				int skillDamage = chooseSkill(in, hero);
 
@@ -562,24 +559,24 @@ public class Rpggame3 {
 					int monsterDamage = monster_attack();
 					System.out.println(monster_name + "의 공격입니다.");
 					System.out.println("데미지는 " + monsterDamage + "입니다.");
-					monster_attacked(monsterDamage);
+					monster_attacked(monsterDamage, hero);
 				}
 			}
 
 			if (monster_hp <= 0) {
 				System.out.println(monster_name + "를 물리쳤습니다!");
-				hero_experience += monster_experience;
-				hero_money += monster_money;
+				hero.setExperience(hero.getExperience() + monster_experience);
+				hero.setMoney(hero.getMoney() + monster_money);
 				System.out.println("경험치를 얻었습니다.");
 				System.out.println("돈을 획득하였습니다.");
-				if (hero_experience >= hero_level * 80) {
-					levelUp();
+				if (hero.getExperience() >= hero.getLevel() * 80) {
+					levelUp(hero);
 				}
 				flag = false;
 
-			} else if (hero_hp <= 0) {
-				System.out.println(hero_name + "이(가) 죽었습니다.");
-				hero_hp = original_hero_hp;
+			} else if (hero.getHp() <= 0) {
+				System.out.println(hero.getName() + "이(가) 죽었습니다.");
+				hero.setHp(original_hero_hp);
 				flag = false;
 			}
 		}
@@ -587,24 +584,32 @@ public class Rpggame3 {
 
 	static int chooseSkill(Scanner in, Hero hero) {
 		System.out.println("스킬을 선택하세요:");
-		System.out.println("1. 쓰러스트 (데미지: " + (hero_level * 10 + hero_power * 30) + ")");
+		System.out.println("1. 쓰러스트 (데미지: " + (hero.getLevel() * 10 + hero.getPower() * 30) + ")");
 
-		if (hero_level >= 10) {
-			System.out.println("2. 삼단 베기 (데미지: " + (3 * (hero_level * 10 + hero_power * 30)) + ")");
+		if (hero.getLevel() >= 10) {
+			System.out.println("2. 삼단 베기 (데미지: " + (3 * (hero.getLevel() * 10 + hero.getPower() * 30)) + ")");
 		}
 
-		if (hero_level >= 15) {
-			System.out.println("3. 지건 (데미지: " + (5 * (hero_level * 10 + hero_power * 30)) + ")");
+		if (hero.getLevel() >= 15) {
+			System.out.println("3. 지건 (데미지: " + (5 * (hero.getLevel() * 10 + hero.getPower() * 30)) + ")");
 		}
 
 		int skillChoice = Integer.parseInt(in.nextLine());
 		switch (skillChoice) {
 		case 1:
-			return hero_level * 10 + hero_power * 30;
+			return hero.getLevel() * 10 + hero.getPower() * 30;
 		case 2:
-			return hero_level >= 10 ? 3 * (hero_level * 10 + hero_power * 30) : 0;
+			if (monster_name.equals("들개")) {
+				return hero.getLevel() >= 10 ? 4 * (hero.getLevel() * 10 + hero.getPower() * 30) : 0;
+			} else {
+				return hero.getLevel() >= 10 ? 3 * (hero.getLevel() * 10 + hero.getPower() * 30) : 0;
+			}
 		case 3:
-			return hero_level >= 15 ? 5 * (hero_level * 10 + hero_power * 30) : 0;
+			if (monster_name.equals("멧돼지")) {
+				return hero.getLevel() >= 15 ? 6 * (hero.getLevel() * 10 + hero.getPower() * 30) : 0;
+			} else {
+				return hero.getLevel() >= 15 ? 5 * (hero.getLevel() * 10 + hero.getPower() * 30) : 0;
+			}
 		default:
 			System.out.println("올바른 번호를 입력하세요.");
 			return 0;
