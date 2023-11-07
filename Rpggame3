@@ -1,0 +1,20 @@
+// Inside the Hero class
+public void increaseStrength() {
+    power += 5;
+}
+
+public void increaseDefense() {
+    defense += 5;
+}
+
+public void increaseExperience() {
+    experience += 50;
+}
+
+public void increaseHP() {
+    hp += 50;
+}
+
+public void increaseMP() {
+    mp += 50;
+}
